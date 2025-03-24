@@ -1,5 +1,4 @@
 from sage.all import Integer
-from theta_structures.dimension_two import AffineThetaPoint
 
 class Biextension:
     @classmethod
@@ -267,36 +266,17 @@ class Biextension:
         g = exp_function(self, m)
         Q = g.Q()
         gT = g.translate_by(Q)
-        monodromy = self.neutral().ratio(gT)
-        # compute ratios
-        correcting_factor = 0
-        if type(g.P()) == AffineThetaPoint:
-            c0=g.zero().coords()
-            cPQ=g.PQ().coords()
-            cP=g.P().coords()
-            cQ=g.Q().coords()
-            for i in range(1,5):
-                if 0 in [c0[i], cPQ[i], cP[i], cQ[i]]:
-                    continue
-                correcting_factor = cPQ[i]*c0[i]*(cP[i]*cQ[i])**(-1)
-                print(f"{i = }")
-                break
-            if correcting_factor == 0:
-                raise ValueError("Correcting factor not found, problems with zero coordinates in the biextension points")
-        else:
-            raise NotImplementedError
-        return (monodromy / correcting_factor**0, monodromy / correcting_factor**m)
+        return self.neutral().ratio(gT)
 
     def tate_pairing(self, n, k=1, d=None, exp_function=None):
         if d is None:
             p=self.P().parent().base_ring().characteristic()
             d=(p**k-1)/n
         if n%2==0:
-            (r1, r2) =self.even_non_reduced_tate_pairing(n, exp_function=exp_function)
-            return r1**d, r2**d
+            r=self.even_non_reduced_tate_pairing(n, exp_function=exp_function)
         else:
             r=self.non_reduced_tate_pairing(n, exp_function=exp_function)
-            return r**d
+        return r**d
 
     def weil_pairing(self, n, exp_function=None):
         if n%2==0:
