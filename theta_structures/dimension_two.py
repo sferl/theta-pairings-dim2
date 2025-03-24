@@ -624,6 +624,29 @@ class AffineThetaPoint(ThetaPoint):
         if not isinstance(other, AffineThetaPoint):
             return False
         return self.coords() == other.coords()
+    
+    def is_proj_eq(self, other):
+        """
+        Check the quality of two ThetaPoints. Note that as this is a
+        projective equality, we must be careful for when certain coefficients may
+        be zero.
+        """
+        if isinstance(other, ThetaPoint):
+            other = self._parent(other.coords())
+        if not isinstance(other, AffineThetaPoint):
+            return False
+
+        a1, b1, c1, d1 = self.coords()
+        a2, b2, c2, d2 = other.coords()
+
+        if d1 != 0 or d2 != 0:
+            return all([a1 * d2 == a2 * d1, b1 * d2 == b2 * d1, c1 * d2 == c2 * d1])
+        elif c1 != 0 or c2 != 0:
+            return all([a1 * c2 == a2 * c1, b1 * c2 == b2 * c1])
+        elif b1 != 0 or b2 != 0:
+            return a1 * b2 == a2 * b1
+        else:
+            return True
 
     def diff_add(P, Q, PQ):
         """
